@@ -10,3 +10,4 @@ services:
     stdin_open: true  
     tty: true         # interactive sh
     entrypoint: ["/bin/bash"]
+    #entrypoint: /home/scripts/executable.sh
