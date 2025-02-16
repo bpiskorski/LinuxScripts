@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  ubuntu-container:
+    build: .
+    container_name: ubuntu-container
+    volumes:
+      - ./scripts:/home/scripts  
+    working_dir: /home/scripts
+    stdin_open: true  
+    tty: true         # interactive sh
+    entrypoint: ["/bin/bash"]
