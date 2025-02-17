@@ -28,4 +28,4 @@ sudo apt install php libapache2-mod-php php-mysql -y #8, 60 for Warsaw
 #check if running
 sudo ufw status
 sudo systemctl status mysql
-sudo systemctl status mysql
+sudo systemctl status apache2
