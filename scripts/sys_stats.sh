@@ -40,6 +40,7 @@ start(){
     3. Backup
     4. List all users
     5. List all shells
+    6. intall logrotate
     0. Exit
     ---
 EOF
@@ -69,7 +70,11 @@ EOF
         printallshells
         start
         ;;
-    
+    6) echo "install logrotate"
+        apt install logrotate -y
+        logrotate --version
+        start
+        ;;
     *)
         echo "make sure u choose available option"
         ;;

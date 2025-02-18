@@ -16,7 +16,7 @@ sudo systemctl start apache2
 sudo apt install mysql-server -y
 #change sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
 #bind address to 0.0.0.0
-sudo systemctl start mysql
+#sudo systemctl start mysql
 
 #mysql -u root #to log in
 #mysql -u root -p 123 --protocol=tcp
@@ -28,4 +28,5 @@ sudo apt install php libapache2-mod-php php-mysql -y #8, 60 for Warsaw
 #check if running
 sudo ufw status
 sudo systemctl status mysql
+sudo systemctl restart apache2
 sudo systemctl status apache2
