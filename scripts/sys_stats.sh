@@ -127,7 +127,14 @@ EOF
                 start
                 ;;
             5)
-                sudo apt update
+                sudo apt-get update
+                sudo apt install apt-utils -y
+                sudo apt install systemctl -y
+                sudo apt-get install net-tools -y
+                sudo apt-get install docker.io -y
+                sudo systemctl start docker
+                
+                start
                 ;;
             99)
                 echo "installing all dependencies"

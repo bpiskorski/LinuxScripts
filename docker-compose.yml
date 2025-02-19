@@ -1,13 +1,15 @@
-version: "3.8"
+#version: "3.8"
 
 services:
   ubuntu-container:
     build: .
     container_name: ubuntu-container
+    privileged: true
     volumes:
       - ./scripts:/home/scripts  
+      - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /home/scripts
     stdin_open: true  
     tty: true         # interactive sh
-    entrypoint: ["/bin/bash"]
+    entrypoint: ["/bin/sh"]
     #entrypoint: /home/scripts/executable.sh
