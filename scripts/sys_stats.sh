@@ -1,9 +1,23 @@
 user=$(whoami)
-date=$(date)
 path=$(pwd)
 kern=$(uname -v)
 memorytotal=$(free -m | awk '/m/ {print $2}')
 memoryused=$(free -m | awk '/m/ {print $3}')
+backupdir='/var/backups'
+backupfile1='apache2.tar.gz'
+backupfile2='mysql.tar.gz'
+backupfile3='php.tar.gz'
+sourcedir='/etc/apache2'
+sourcedir2='/etc/mysql'
+sourcedir3='/etc/php'
+
+backup(){
+    mkdir -p $backupdir
+    tar -czf $backupdir/$backupfile1 $sourcedir
+    tar -czf $backupdir/$backupfile2 $sourcedir2
+    tar -czf $backupdir/$backupfile3 $sourcedir3
+    echo "backup done"
+}
 showuptime(){
     up=$(uptime -p | cut -c4-)
     cat << EOF
@@ -40,7 +54,7 @@ start(){
     3. Backup
     4. List all users
     5. List all shells
-    6. intall logrotate
+    6. Dependencies
     0. Exit
     ---
 EOF
@@ -59,7 +73,7 @@ EOF
         start
         ;;
     3) 
-        echo "not developed yet"
+        backup
         start
         ;;
     4) echo "list all usrs "
@@ -70,14 +84,70 @@ EOF
         printallshells
         start
         ;;
-    6) echo "install logrotate"
-        apt install logrotate -y
-        logrotate --version
+    6)
+        cat<< EOF
+        ---
+    Choose dependency to install:
+    1. sudo
+    2. wget
+    3. curl
+    4. logrotate
+    99. Intall all
+    0. Back
+    ---
+EOF
+            read y
+            
+            case $y in
+            0)
+                start
+                ;;
+            1)
+                echo "installing sudo"
+                apt install sudo -y
+                sudo --version
+                start
+                ;;
+            2)
+                echo "installing wget"
+                apt install wget -y
+                wget --version
+                start
+                ;;
+            3)
+                echo "installing curl"
+                apt install curl -y
+                curl --version
+                start
+                ;;
+            4)  
+                echo "install logrotate"
+                apt install logrotate -y
+                logrotate --version
+                start
+                ;;
+            5)
+                sudo apt update
+                ;;
+            99)
+                echo "installing all dependencies"
+                apt install sudo wget curl logrotate -y
+                sudo --version
+                wget --version
+                curl --version
+                logrotate --version
+                start
+                ;;
+            *)
+                start
+                ;;
+            
+         esac
+         ;;
+    *)
         start
         ;;
-    *)
-        echo "make sure u choose available option"
-        ;;
+    
     esac
 }
 
