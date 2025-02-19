@@ -1,8 +1,6 @@
 user=$(whoami)
 path=$(pwd)
 kern=$(uname -v)
-memorytotal=$(free -m | awk '/m/ {print $2}')
-memoryused=$(free -m | awk '/m/ {print $3}')
 backupdir='/var/backups'
 backupfile1='apache2.tar.gz'
 backupfile2='mysql.tar.gz'
@@ -28,6 +26,8 @@ EOF
 }
 
 calculatememory(){
+    memorytotal=$(free -m | awk '/m/ {print $2}')
+    memoryused=$(free -m | awk '/m/ {print $3}')
    # mem=$("(memoryused / memorytotal) * 100 | bc")
     cat << EOF
     ---
