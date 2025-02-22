@@ -1,108 +1,98 @@
 #https://gist.github.com/Atem18/4696071
+---
 - name: django app with mysql
-  hosts: all
+  hosts: localhost
   become: yes
-  vers:
+  vars:
     d_name: djangoProject
     d_user: django
     d_dir: /home/django/djangoProject
     mysql_root_pass: root
     mysql_db: db
+    mysql_host: "mysql"
+  tasks:
+ # - name: verify dpkg database
+  #  command: sudo dpkg --configure -a
+  #  changed_when: false
 
-- name: install packages
-  apt:
+  - name: install packages
+    apt:
       name:
         - python3
         - python3-pip
         - python3-venv
-        - mysql-server
+        - python3-apt
+        - python3-mysqldb
         - libmysqlclient-dev
         - nginx
       state: present
 
-- name: start mysql
-  service:
-    name: mysql
-    state: started
-    enabled: yes
+  - name: create mysql database
+    mysql_db:
+      name: "{{ mysql_db }}"
+      state: present
+      login_host: "{{ mysql_host }}"
+      login_user: root
+      login_password: ""
 
-- name: create mysql database
-  mysql_db:
-    name: "{{ mysql_db }}"
-    state: present
-    login_user: root
-    login_password: "{{ mysql_root_pass }}"
+  - name: create mysql user
+    mysql_user:
+      name: "{{ d_user }}"
+      password: "{{ d_user }}"
+      state: present
+      priv: "{{ d_user }}.*:ALL"
+      login_user: root
+      login_password: "{{ mysql_root_pass }}"
+      host: "{{ mysql_host }}"
 
-- name: create mysql user
-  mysql_user:
-    name: "{{ d_user }}"
-    password: "{{ d_user }}"
-    state: present
-    login_user: root
-    login_password: "{{ mysql_root_pass }}"
-- name: configure mysql
-  lineinfile:
-    path: /etc/mysql/mysql.conf.d/mysqld.cnf
-    regexp: "^bind-address"
-    line: "bind-address = 0.0.0.0"
-  notify:
-    - restart mysql
+  - name: create django user
+    user:
+      name: "{{ d_user }}"
+      password: "{{ d_user }}"
+      state: present
+      shell: /bin/bash
+      createhome: yes
 
-- name: create django user
-  user:
-    name: "{{ d_user }}"
-    password: "{{ d_user }}"
-    state: present
-    shell: /bin/bash
-    createhome: yes
+  - name: create django directory
+    file:
+      path: "{{ d_dir }}"
+      state: directory
+      owner: "{{ d_user }}"
+      group: "{{ d_user }}"
+      mode: 0755
 
-- name: create django directory
-  file:
-    path: "{{ d_dir }}"
-    state: directory
-    owner: "{{ d_user }}"
-    group: "{{ d_user }}"
-    mode: 0755
+  - name: copy files
+    copy:
+      src: djangoProject/
+      dest: "{{ d_dir }}"
+      owner: "{{ d_user }}"
+      group: "{{ d_user }}"
+      mode: 0755  
 
-- name: copy files
-  copy: src=djangoProject/ dest="{{ d_dir }}"
 
-- name: create virtualenv
-  command: python3 -m venv "{{ d_dir }}/venv"
-
-- name: activate virtualenv
-  command: source "{{ d_dir }}/venv/bin/activate"
-  args:
-    chdir: "{{ d_dir }}"
-
-- name: install requirements
-  pip:
-    requirements: "{{ d_dir }}/requirements.txt"
-    virtualenv: "{{ d_dir }}/venv"
-
-- name: configure nginx
-  template:
-    src: nginx.conf
-    dest: /etc/nginx/sites-available/djangoProject
-  notify:
-    - restart nginx
-
-- name: enable nginx
-  file:
-    src: /etc/nginx/sites-available/djangoProject
-    dest: /etc/nginx/sites-enabled/djangoProject
-    state: link
+  - name: create virtualenv
+    command: python3 -m venv "{{ d_dir }}/venv"
     
-  notify:
-    - restart nginx
+
+  - name: activate virtualenv
+    command: source "{{ d_dir }}/venv/bin/activate"
+    args:
+      chdir: "{{ d_dir }}"
+
+  - name: install requirements
+    pip:
+      requirements: "{{ d_dir }}/requirements.txt"
+      virtualenv: "{{ d_dir }}/venv"
+
+  - name: configure nginx
+    template:
+      src: nginx.conf
+      dest: /etc/nginx/sites-available/djangoProject
+    notify:
+      - restart nginx
 
   handlers:
-    - name: restart mysql
-      service:
-        name: mysql
-        state: restarted
-
-    - name: restart nginx
-      service:
-        name: nginx
-        state: restarted
+      - name: restart nginx
+        service:
+          name: nginx
+          state: restarted

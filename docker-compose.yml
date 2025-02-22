@@ -13,3 +13,21 @@ services:
     tty: true         # interactive sh
     entrypoint: ["/bin/sh"]
     #entrypoint: /home/scripts/executable.sh
+
+  mysql::
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+      MYSQL_USER: django
+      MYSQL_PASSWORD: django
+    ports:
+      - "3306:3306"
+    restart: always
+    networks:
+      - django-network
+    driver: bridge
+    volumes:
+      - mysql-data
+    
