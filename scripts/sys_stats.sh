@@ -9,7 +9,7 @@ sourcedir='/etc/apache2'
 sourcedir2='/etc/mysql'
 sourcedir3='/etc/php'
 
-backup(){
+bckup(){
     mkdir -p $backupdir
     tar -czf $backupdir/$backupfile1 $sourcedir
     tar -czf $backupdir/$backupfile2 $sourcedir2
@@ -73,7 +73,7 @@ EOF
         start
         ;;
     3) 
-        backup
+        bckup
         start
         ;;
     4) echo "list all usrs "

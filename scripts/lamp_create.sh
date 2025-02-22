@@ -16,8 +16,15 @@ installapache(){
     source /etc/apache2/envvars
     sudo systemctl start apache2
 }
+
 installmysql(){
-    sudo apt install mysql-server -y
+    sudo apt update
+    if ! dpkg -s mysql-server &> /dev/null;then
+        sudo apt install mysql-server -y
+    else
+        echo "skipping sql installation"
+    fi
+    
 }
 installphp(){
     sudo apt install php libapache2-mod-php php-mysql -y
