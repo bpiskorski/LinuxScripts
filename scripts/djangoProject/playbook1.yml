@@ -86,7 +86,7 @@
 
   - name: configure nginx
     template:
-      src: nginx.conf
+      src: templates/nginx.conf
       dest: /etc/nginx/sites-available/djangoProject
     notify:
       - restart nginx
